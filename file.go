@@ -7,6 +7,6 @@ func RemoveAll(path ...string) {
 	var err error
 	for _, p := range path {
 		err = os.RemoveAll(p)
-		Check(err, "Remove error: path '%s'\n%v", p)
+		Check("Remove error: path '%s'\n%v", p, err)
 	}
 }
