@@ -25,11 +25,11 @@ func init() {
 	}
 }
 
-// GoExec execute go commang with GOPATH=$GOPATH:`pwd`
-func GoExec(params ...string) {
+// Exec execute go commang with GOPATH=$GOPATH:`pwd`
+func Exec(params ...string) {
 	var err error
-	fmt.Printf("run: go %s", strings.Join(params, " "))
-	cmd := exec.Command("go", params...)
+	fmt.Printf("run: %s", strings.Join(params, " "))
+	cmd := exec.Command(params[0], params[1:]...)
 	cmd.Env = env
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
