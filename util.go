@@ -58,8 +58,8 @@ func JSONUnmarshal(b []byte, v interface{}) interface{} {
 	return v
 }
 
-// InSlice func
-func InSlice(v interface{}, list ...interface{}) bool {
+// InStringSlice func
+func InStringSlice(v string, list ...string) bool {
 	for _, vl := range list {
 		if v == vl {
 			return true
