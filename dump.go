@@ -72,23 +72,36 @@ func fdump(w io.Writer, rx int, rd int, tab string, value reflect.Value) {
 		fmt.Fprintf(w, "\n%s}", tab)
 	} else if value.Kind() == reflect.Slice {
 		ntab := tab + tabSpace
-		fmt.Fprintf(w, "[ /* Type:%s Length:%v */\n%s", value.Type().String(), value.Len(), ntab)
-		il := value.Len()
-		for i := 0; i < il && i < MaxSliceLen; i++ {
-			vi := value.Index(i)
-			if i > 0 {
-				fmt.Fprintf(w, ",\n%s/* Index:%v */ ", ntab, i)
-			} else {
-				fmt.Fprint(w, "/* Index:0 */ ")
+		if value.Type().String() == "[]uint8" {
+			il := value.Len()
+			fmt.Fprintf(w, "[ /* Type:%s Length:%v */\n%s      00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F\n%s0000  ", value.Type().String(), il, ntab, ntab)
+			for i, j := 0, 0; i < il; i++ {
+				if j == 16 {
+					fmt.Fprintf(w, "\n%s%04X  ", ntab, i)
+					j = 1
+				} else {
+					j++
+				}
+				fmt.Fprintf(w, "%02X ", value.Index(i).Interface())
 			}
-			fdump(w, rx, rd+1, ntab, vi)
+			fmt.Fprintf(w, "\n%s]%s", tab, "")
+		} else {
+			fmt.Fprintf(w, "[ /* Type:%s Length:%v */\n%s", value.Type().String(), value.Len(), ntab)
+			il := value.Len()
+			for i := 0; i < il && i < MaxSliceLen; i++ {
+				vi := value.Index(i)
+				if i > 0 {
+					fmt.Fprintf(w, ",\n%s/* Index:%v */ ", ntab, i)
+				} else {
+					fmt.Fprint(w, "/* Index:0 */ ")
+				}
+				fdump(w, rx, rd+1, ntab, vi)
+			}
+			if il > MaxSliceLen {
+				fmt.Fprintf(w, "\n%s/* too many items */", ntab)
+			}
+			fmt.Fprintf(w, "\n%s]%s", tab, "")
 		}
-		if il > MaxSliceLen {
-			fmt.Fprintf(w, "\n%s/* too many items */", ntab)
-		}
-		fmt.Fprintf(w, "\n%s]%s", tab, "")
-		// } else if value.CanInterface() {
-		// 	fmt.Fprintf(w, "%+v \\\\ Type:%s", value.Interface(), value.Type().String())
 	} else if value.Kind() == reflect.Map {
 		ntab := tab + tabSpace
 		fmt.Fprintf(w, "{ /* Type:%s */\n%s", value.Type().String(), ntab)
