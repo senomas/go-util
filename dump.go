@@ -6,8 +6,6 @@ import (
 	"io"
 	"reflect"
 	"strings"
-
-	util "github.com/senomas/go-util"
 )
 
 const (
@@ -60,7 +58,7 @@ func fdump(w io.Writer, rx int, rd int, tab string, value reflect.Value) {
 		for i, j := 0, 0; i < il && i < MaxFieldLen; i++ {
 			tf := value.Type().Field(i)
 			tag := strings.Split(value.Type().Field(i).Tag.Get("dump"), ",")
-			if !util.InStringSlice("ignore", tag...) {
+			if !InStringSlice("ignore", tag...) {
 				if j > 0 {
 					fmt.Fprintf(w, ",\n%s\"%s\": ", ntab, tf.Name)
 				} else {
